@@ -78,6 +78,11 @@ def unlink_tag_from_discussion(link: DiscussionHashtag):
         session.rollback()
 
 
+def get_likes_count_for_discussion(discussion_id: int) -> int:
+    discussion = get_discussion_by_id(discussion_id)
+    return discussion.likes_count
+
+
 def get_discussion_like(author_id: int, discussion_id: int) -> DiscussionLike:
     return session.query(DiscussionLike).filter_by(author_id=author_id, discussion_id=discussion_id).first()
 

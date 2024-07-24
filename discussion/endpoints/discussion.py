@@ -5,11 +5,12 @@ from flask import Blueprint, request
 from middlewares.is_logged_in_user_for_comment import is_logged_in_user_for_comment
 from middlewares.is_logged_in_user_for_discussion import is_logged_in_user_for_discussion
 from query.comment import add_comment, get_comment_by_id, remove_comment, update_comment_properties, get_comment_like, \
-    add_like_to_comment, remove_like_from_comment
+    add_like_to_comment, remove_like_from_comment, get_all_comments_by_discussion
 from query.discussion import get_all_discussions_by_author, add_discussion, get_discussion_by_id, \
     update_discussion_properties, \
     remove_discussion, get_all_discussions_by_authors, link_tag_to_discussion, unlink_tag_from_discussion, \
-    get_link_of_hashtag_to_discussion, add_like_to_discussion, get_discussion_like, remove_like_from_discussion
+    get_link_of_hashtag_to_discussion, add_like_to_discussion, get_discussion_like, remove_like_from_discussion, \
+    get_likes_count_for_discussion
 from query.hashtag import get_hashtag_by_tag, add_hashtag, get_hashtag_by_id
 from services.es.Discussion.discussion import discussionES
 from services.image_service import upload_image, delete_image, get_file_location
@@ -119,6 +120,19 @@ def search_discussion():
         return generate_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
+@discussion_endpoints.route("/<int:discussion_id>/like", methods=["GET"])
+def get_likes_of_discussion(discussion_id):
+    try:
+        user_id = int(request.headers.get('X-User'))
+        discussion = get_discussion_by_id(discussion_id)
+        if discussion is None:
+            return generate_response(message="Discussion not found", status=HTTPStatus.NOT_FOUND)
+        likes_count = get_likes_count_for_discussion(discussion_id)
+        return generate_response(data=likes_count, status=HTTPStatus.OK)
+    except Exception as _:
+        return generate_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
 @discussion_endpoints.route("/<int:discussion_id>/like", methods=["POST"])
 def like_discussion(discussion_id):
     try:
@@ -190,6 +204,19 @@ def remove_tag_to_discussion(discussion_id, tag_id):
             return generate_response(message="Hashtag not linked to discussion", status=HTTPStatus.BAD_REQUEST)
         unlink_tag_from_discussion(link)
         return generate_response(message="Tag removed", status=HTTPStatus.OK)
+    except Exception as _:
+        return generate_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+@discussion_endpoints.route("/<int:discussion_id>/comments", methods=["GET"])
+def get_comments_for_a_discussion(discussion_id):
+    try:
+        user_id = int(request.headers.get('X-User'))
+        discussion = get_discussion_by_id(discussion_id)
+        if discussion is None:
+            return generate_response(message="Discussion not found", status=HTTPStatus.NOT_FOUND)
+        comments = [comment.serialise() for comment in get_all_comments_by_discussion(discussion_id)]
+        return generate_response(data=comments, status=HTTPStatus.OK)
     except Exception as _:
         return generate_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
 

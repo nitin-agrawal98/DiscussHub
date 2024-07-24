@@ -1,0 +1,63 @@
+# This is incomplete as of now and hence might not work
+services:
+  api_gateway:
+    image: api_gateway:latest
+    build:
+      context: ./api_gateway
+    networks:
+      - backend_network
+      - frontend_network
+    depends_on:
+      - user
+      - discussion
+
+  user:
+    image: user:latest
+    build:
+      context: ./user
+    expose:
+      - "5001"
+    networks:
+      - backend_network
+
+  discussion:
+    image: discussion:latest
+    build:
+      context: ./discussion
+    expose:
+      - "5002"
+    networks:
+      - backend_network
+    depends_on:
+      - elaticsearch
+
+  elaticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - 9200:9200
+    networks:
+      - backend_network
+
+  db:
+    image: 
+
+  frontend:
+    image: frontend:latest
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api_gateway
+    networks:
+      - frontend_network
+
+networks:
+  - backend_network
+  - frontend_network
