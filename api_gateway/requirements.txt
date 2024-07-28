@@ -1,0 +1,12 @@
+Flask==3.0.3
+Flask-Cors==4.0.1
+load-dotenv==0.1.0
+MarkupSafe==2.1.5
+PyJWT==2.8.0
+PyMySQL==1.1.1
+python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
+requests==2.32.3
+typing_extensions==4.12.2
+urllib3==2.2.2
+Werkzeug==3.0.3

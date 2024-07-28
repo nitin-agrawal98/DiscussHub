@@ -1,0 +1,2 @@
+DISCUSSION_INDEX = 'discussions'
+DEFAULT_SEARCH_SIZE = 10
