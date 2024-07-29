@@ -11,8 +11,8 @@ from query.discussion import get_all_discussions_by_author, add_discussion, get_
     remove_discussion, get_all_discussions_by_authors, link_tag_to_discussion, unlink_tag_from_discussion, \
     get_link_of_hashtag_to_discussion, add_like_to_discussion, get_discussion_like, remove_like_from_discussion
 from query.hashtag import get_hashtag_by_tag, add_hashtag, get_hashtag_by_id
+from services.es.Discussion.discussion import discussionES
 from services.image_service import upload_image, delete_image, get_file_location
-from services.es.Discussion.discussion import search
 from utils.response import generate_response
 
 discussion_endpoints = Blueprint('discussion_endpoints', __name__)
@@ -113,7 +113,7 @@ def search_discussion():
         hashtags = request.args.get('hashtags', [])
         if hashtags:
             hashtags = hashtags.split(',')
-        data = search(query_text=text, hashtags=hashtags)
+        data = discussionES.search({"query_text": text, "hashtags": hashtags})
         return generate_response(data=data, status=HTTPStatus.OK)
     except Exception as _:
         return generate_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)

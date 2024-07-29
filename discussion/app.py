@@ -5,7 +5,7 @@ from database import init_db
 from query.discussion import get_all_discussions
 from endpoints.discussion import discussion_endpoints
 from endpoints.hashtag import hashtag_endpoints
-from services.es.Discussion.discussion import index
+from services.es.Discussion.discussion import discussionES
 
 API_ROOT = '/api'
 
@@ -21,7 +21,7 @@ app.register_blueprint(hashtag_endpoints, url_prefix=API_ROOT + '/hashtags')
 # Indexing all discussions at the start
 discussions = get_all_discussions()
 for discussion in discussions:
-    index(discussion)
+    discussionES.index(discussion)
 
 
 if __name__ == '__main__':
